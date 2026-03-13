@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Complaints of Poor Sanitation</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin: 10px;
+  }
+  video, canvas {
+    width: 95%;
+    max-width: 400px;
+    border: 1px solid #333;
+    border-radius: 10px;
+    margin-top: 10px;
+  }
+  button {
+    padding: 12px 20px;
+    font-size: 16px;
+    margin: 10px 5px;
+    border-radius: 5px;
+    background-color: #007BFF;
+    color: white;
+    border: none;
+  }
+  button:disabled {
+    background-color: #999;
+  }
+  #qrcode {
+    margin-top: 20px;
+  }
+</style>
+</head>
+<body>
+
+<h2>Complaints of Poor Sanitation</h2>
+
+<video id="video" autoplay playsinline></video><br>
+<button onclick="takePhoto()">Capture Photo</button>
+<button id="saveBtn" onclick="savePhoto()" disabled>Save Photo</button><br><br>
+
+<canvas id="canvas"></canvas>
+
+<div id="qrcode"></div>
+
+<!-- QR Code Library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script>
+const video = document.getElementById('video');
+const canvas = document.getElementById('canvas');
+const saveBtn = document.getElementById('saveBtn');
+
+// Access rear camera on mobile devices
+navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } })
+.then(stream => {
+    video.srcObject = stream;
+})
+.catch(err => {
+    alert('Camera access denied: ' + err);
+});
+
+// Capture photo with timestamp and text
+function takePhoto() {
+    const ctx = canvas.getContext('2d');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    ctx.drawImage(video, 0, 0);
+
+    const now = new Date().toLocaleString();
+    ctx.font = "18px Arial";
+    ctx.fillStyle = "red";
+    ctx.fillText("Complaints of Poor Sanitation", 10, 30);
+    ctx.fillText(now, 10, canvas.height - 20);
+
+    saveBtn.disabled = false;
+}
+
+// Save captured photo
+function savePhoto() {
+    const link = document.createElement('a');
+    link.download = 'sanitation_complaint_' + Date.now() + '.png';
+    link.href = canvas.toDataURL('image/png');
+    link.click();
+}
+
+// Generate QR code for this page
+new QRCode(document.getElementById("qrcode"), {
+    text: window.location.href,
+    width: 200,
+    height: 200
+});
+</script>
+
+</body>
+</html>
